@@ -12,6 +12,7 @@ type Cards []struct {
 	Description string   `json:"oracle_text"`
 	ManaCost    string   `json:"mana_cost"`
 	CMC         float32  `json:"cmc"`
+	Digital     bool     `json:"digital"`
 	Identity    []string `json:"color_identity"`
 	Keywords    []string `json:"keywords"`
 	// Legalities []struct {
@@ -62,6 +63,20 @@ func (cards *Cards) HasIdentity(identity []string) (Cards, bool) {
 		if cardMatch {
 			result = append(result, card)
 		}
+	}
+
+	return result, true
+}
+
+func (cards *Cards) IncludeDigital(include bool) (Cards, bool) {
+	var result Cards
+
+	for _, card := range *cards {
+		if !include && card.Digital {
+			continue
+		}
+
+		result = append(result, card)
 	}
 
 	return result, true
