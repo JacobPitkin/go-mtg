@@ -4,28 +4,33 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Cards []struct {
-	Id          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"oracle_text"`
-	ManaCost    string   `json:"mana_cost"`
-	CMC         float32  `json:"cmc"`
-	Digital     bool     `json:"digital"`
-	Identity    []string `json:"color_identity"`
-	Keywords    []string `json:"keywords"`
-	// Legalities []struct {
-	// 	Commander string `json:"commander"`
-	// } `json:"legalities"`
-	Set         string `json:"set"`
-	SetName     string `json:"set_name"`
-	GameChanger bool   `json:"game_changer"`
-	EdhrecRank  int    `json:"edhrec_rank"`
+	Id          string            `json:"id"`
+	Name        string            `json:"name"`
+	Description string            `json:"oracle_text"`
+	ManaCost    string            `json:"mana_cost"`
+	CMC         float32           `json:"cmc"`
+	Digital     bool              `json:"digital"`
+	Identity    []string          `json:"color_identity"`
+	Keywords    []string          `json:"keywords"`
+	Legalities  map[string]string `json:"legalities"`
+	Set         string            `json:"set"`
+	SetName     string            `json:"set_name"`
+	GameChanger bool              `json:"game_changer"`
+	EdhrecRank  int               `json:"edhrec_rank"`
 }
 
 func NewCards() *Cards {
-	cardFilepath := "/home/groggy/mtg-cards/cards.json"
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	cardFilepath := os.Getenv("CARDS_LOCATION")
 
 	fileData, err := os.ReadFile(cardFilepath)
 	if err != nil {
