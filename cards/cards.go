@@ -101,11 +101,13 @@ var layoutName = map[CardLayout]string{
 	Reversible:       "reversible_card",
 }
 
+var cards Cards
+
 func (cl CardLayout) String() string {
 	return layoutName[cl]
 }
 
-func NewCards() *Cards {
+func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -118,12 +120,14 @@ func NewCards() *Cards {
 		log.Fatal(err)
 	}
 
-	var cards Cards
 	if err := json.Unmarshal(fileData, &cards); err != nil {
 		log.Fatal(err)
 	}
+}
 
-	return &cards
+func NewCards() Cards {
+	var newCards Cards
+	return append(newCards, cards...)
 }
 
 func (cards *Cards) HasIdentity(identity []string) (Cards, bool) {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -41,11 +40,11 @@ func main() {
 	// 	fmt.Println(card.Name)
 	// }
 
-	result, err := json.MarshalIndent(uniqueFiltered, "", "    ")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// result, err := json.MarshalIndent(uniqueFiltered, "", "    ")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Println(string(result))
-	fmt.Printf("%d / %d\n", len(uniqueFiltered), len(*cardsList))
+	// fmt.Println(string(result))
+	fmt.Printf("%d / %d\n", len(uniqueFiltered), len(cardsList))
 }
