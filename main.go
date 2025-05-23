@@ -10,6 +10,8 @@ func main() {
 	cardsList := cards.NewCards()
 
 	commanders := cardsList.IsEligibleCommander()
+	commanders = commanders.Unique()
+	commanders.SortByName()
 
 	for _, card := range commanders {
 		fmt.Println(card.Name)

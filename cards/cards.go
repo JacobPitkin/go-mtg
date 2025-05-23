@@ -4,12 +4,15 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/joho/godotenv"
 )
 
-type Cards []struct {
+type CardList []Card
+
+type Card struct {
 	Id           string            `json:"id"`
 	Name         string            `json:"name"`
 	CardFaces    []CardFace        `json:"card_faces"`
@@ -47,6 +50,8 @@ type CardFace struct {
 }
 
 type CardLayout int
+
+type ByName CardList
 
 const (
 	Normal CardLayout = iota
@@ -102,7 +107,7 @@ var layoutName = map[CardLayout]string{
 	Reversible:       "reversible_card",
 }
 
-var cards Cards
+var cards CardList
 
 func (cl CardLayout) String() string {
 	return layoutName[cl]
@@ -126,13 +131,13 @@ func init() {
 	}
 }
 
-func NewCards() Cards {
-	var newCards Cards
-	return append(newCards, cards...)
+func NewCards() CardList {
+	var newCardList CardList
+	return append(newCardList, cards...)
 }
 
-func (cards *Cards) HasIdentity(identity []string) Cards {
-	var result Cards
+func (cards *CardList) HasIdentity(identity []string) CardList {
+	var result CardList
 
 	for _, card := range *cards {
 		cardMatch := true
@@ -159,8 +164,8 @@ func (cards *Cards) HasIdentity(identity []string) Cards {
 	return result
 }
 
-func (cards *Cards) IncludeDigital(include bool) Cards {
-	var result Cards
+func (cards *CardList) IncludeDigital(include bool) CardList {
+	var result CardList
 
 	for _, card := range *cards {
 		if !include && card.Digital {
@@ -173,8 +178,8 @@ func (cards *Cards) IncludeDigital(include bool) Cards {
 	return result
 }
 
-func (cards *Cards) IsEligibleCommander() Cards {
-	var result Cards
+func (cards *CardList) IsEligibleCommander() CardList {
+	var result CardList
 
 	for _, card := range *cards {
 		types := strings.Split(card.TypeLine, " ")
@@ -201,8 +206,8 @@ func (cards *Cards) IsEligibleCommander() Cards {
 	return result
 }
 
-func (cards *Cards) IsLayout(layout CardLayout) Cards {
-	var result Cards
+func (cards *CardList) IsLayout(layout CardLayout) CardList {
+	var result CardList
 
 	for _, card := range *cards {
 		if card.Layout == layout.String() {
@@ -213,8 +218,12 @@ func (cards *Cards) IsLayout(layout CardLayout) Cards {
 	return result
 }
 
-func (cards *Cards) Unique() Cards {
-	var result Cards
+func (cards *CardList) SortByName() {
+	sort.Sort(ByName(*cards))
+}
+
+func (cards *CardList) Unique() CardList {
+	var result CardList
 	names := []string{}
 
 	for _, card := range *cards {
@@ -234,8 +243,8 @@ func (cards *Cards) Unique() Cards {
 	return result
 }
 
-func (cards *Cards) WithCmc(cmc float32) Cards {
-	var result Cards
+func (cards *CardList) WithCmc(cmc float32) CardList {
+	var result CardList
 
 	for _, card := range *cards {
 		if card.CMC == cmc {
@@ -245,3 +254,10 @@ func (cards *Cards) WithCmc(cmc float32) Cards {
 
 	return result
 }
+
+// Sorting
+func (cards ByName) Len() int { return len(cards) }
+func (cards ByName) Less(i, j int) bool {
+	return cards[i].Name < cards[j].Name
+}
+func (cards ByName) Swap(i, j int) { cards[i], cards[j] = cards[j], cards[i] }
