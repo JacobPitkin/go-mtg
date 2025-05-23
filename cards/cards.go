@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -130,7 +131,7 @@ func NewCards() Cards {
 	return append(newCards, cards...)
 }
 
-func (cards *Cards) HasIdentity(identity []string) (Cards, bool) {
+func (cards *Cards) HasIdentity(identity []string) Cards {
 	var result Cards
 
 	for _, card := range *cards {
@@ -155,10 +156,10 @@ func (cards *Cards) HasIdentity(identity []string) (Cards, bool) {
 		}
 	}
 
-	return result, true
+	return result
 }
 
-func (cards *Cards) IncludeDigital(include bool) (Cards, bool) {
+func (cards *Cards) IncludeDigital(include bool) Cards {
 	var result Cards
 
 	for _, card := range *cards {
@@ -169,10 +170,38 @@ func (cards *Cards) IncludeDigital(include bool) (Cards, bool) {
 		result = append(result, card)
 	}
 
-	return result, true
+	return result
 }
 
-func (cards *Cards) IsLayout(layout CardLayout) (Cards, bool) {
+func (cards *Cards) IsEligibleCommander() Cards {
+	var result Cards
+
+	for _, card := range *cards {
+		types := strings.Split(card.TypeLine, " ")
+		isLegendary := false
+		isCreature := false
+
+		for _, cardType := range types {
+			if cardType == "Legendary" {
+				isLegendary = true
+				continue
+			}
+
+			if cardType == "Creature" {
+				isCreature = true
+				continue
+			}
+		}
+
+		if isLegendary && isCreature {
+			result = append(result, card)
+		}
+	}
+
+	return result
+}
+
+func (cards *Cards) IsLayout(layout CardLayout) Cards {
 	var result Cards
 
 	for _, card := range *cards {
@@ -181,10 +210,10 @@ func (cards *Cards) IsLayout(layout CardLayout) (Cards, bool) {
 		}
 	}
 
-	return result, true
+	return result
 }
 
-func (cards *Cards) Unique() (Cards, bool) {
+func (cards *Cards) Unique() Cards {
 	var result Cards
 	names := []string{}
 
@@ -202,10 +231,10 @@ func (cards *Cards) Unique() (Cards, bool) {
 		}
 	}
 
-	return result, true
+	return result
 }
 
-func (cards *Cards) WithCmc(cmc float32) (Cards, bool) {
+func (cards *Cards) WithCmc(cmc float32) Cards {
 	var result Cards
 
 	for _, card := range *cards {
@@ -214,5 +243,5 @@ func (cards *Cards) WithCmc(cmc float32) (Cards, bool) {
 		}
 	}
 
-	return result, true
+	return result
 }
