@@ -1,12 +1,26 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
 
 	"jacobpitkin.com/go-mtg/cards"
 )
 
 func main() {
+	http.HandleFunc("/", handleRoot)
+	http.HandleFunc("/cards", cardHandler)
+
+	http.ListenAndServe(":8080", nil)
+}
+
+func handleRoot(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "'Dis my house! Entry, please.")
+}
+
+func cardHandler(w http.ResponseWriter, r *http.Request) {
 	cardsList := cards.NewCards()
 
 	commanders := cardsList.IsEligibleCommander()
@@ -17,11 +31,11 @@ func main() {
 		fmt.Println(card.Name)
 	}
 
-	// result, err := json.MarshalIndent(uniqueFiltered, "", "    ")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	result, err := json.MarshalIndent(commanders, "", "    ")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// fmt.Println(string(result))
-	fmt.Printf("%d / %d\n", len(commanders), len(cardsList))
+	fmt.Fprintln(w, string(result))
+	// fmt.Fprintf(w, "%d / %d\n", len(commanders), len(cardsList))
 }
