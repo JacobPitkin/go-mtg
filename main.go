@@ -7,13 +7,15 @@ import (
 	"net/http"
 
 	"jacobpitkin.com/go-mtg/cards"
+	"jacobpitkin.com/go-mtg/database"
 )
 
 func main() {
-	http.HandleFunc("/", handleRoot)
-	http.HandleFunc("/cards", cardHandler)
+	database.Connect()
+	// http.HandleFunc("/", handleRoot)
+	// http.HandleFunc("/cards", cardHandler)
 
-	http.ListenAndServe(":8080", nil)
+	// http.ListenAndServe(":8080", nil)
 }
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {

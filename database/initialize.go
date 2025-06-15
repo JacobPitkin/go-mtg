@@ -1,64 +1,53 @@
 package database
 
 import (
-	"database/sql"
+	"context"
+	"fmt"
 	"log"
+	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"jacobpitkin.com/go-mtg/cards"
 )
 
-var db *sql.DB
+// func init() {
+// 	_, err := mongo.Connect(options.Client().ApplyURI("mongodb://localhost:27017"))
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-func init() {
-	log.Println("Initializing sql database")
-	db, err := sql.Open("sqlite3", "./test.db")
+// 	fmt.Println("Connected to MongoDB on init")
+// }
+
+func Connect() {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	client, err := mongo.Connect(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			panic(err)
+		}
+	}()
+
+	coll := client.Database("mtg").Collection("cards")
+	cmc3 := bson.M{"cmc": 3}
+
+	var result cards.CardList
+	cursor, err := coll.Find(context.TODO(), cmc3)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	cardsTableStatement := `
-		CREATE TABLE IF NOT EXISTS cards (
-			id TEXT NOT NULL PRIMARY KEY,
-			name TEXT,
-			cmc REAL,
-			defense TEXT,
-			description TEXT,
-			digital INTEGER,
-			edhrec_rank INTEGER,
-			game_changer INTEGER,
-			layout TEXT,
-			mana_cost TEXT,
-			power TEXT,
-			rarity TEXT,
-			set TEXT,
-			set_name TEXT,
-			toughness TEXT,
-			type_line TEXT
-		);
-	`
-
-	_, err = db.Exec(cardsTableStatement)
-	if err != nil {
+	if err = cursor.All(context.TODO(), &result); err != nil {
 		log.Fatal(err)
 	}
 
-	cardFacesTableStatement := `
-		CREATE TABLE IF NOT EXISTS card_faces (
-			id TEXT NOT NULL FOREIGN KEY,
-			cmc REAL,
-			defense TEXT,
-			description TEXT,
-			layout TEXT,
-			mana_cost TEXT,
-			name TEXT,
-			oracle_id TEXT,
-			power TEXT,
-			toughness TEXT
-		);
-	`
-
-	_, err = db.Exec(cardFacesTableStatement)
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println("Connected to MongoDB on Connect")
+	fmt.Println(result)
 }
