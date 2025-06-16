@@ -7,11 +7,11 @@ import (
 	"net/http"
 
 	"jacobpitkin.com/go-mtg/cards"
-	"jacobpitkin.com/go-mtg/database"
+	"jacobpitkin.com/go-mtg/datastore"
 )
 
 func main() {
-	database.Connect()
+	datastore.Connect()
 	// http.HandleFunc("/", handleRoot)
 	// http.HandleFunc("/cards", cardHandler)
 
