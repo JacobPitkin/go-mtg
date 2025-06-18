@@ -253,8 +253,6 @@ func (cards *CardList) WithCmc(cmc float32) CardList {
 }
 
 // Sorting
-func (cards ByName) Len() int { return len(cards) }
-func (cards ByName) Less(i, j int) bool {
-	return cards[i].Name < cards[j].Name
-}
-func (cards ByName) Swap(i, j int) { cards[i], cards[j] = cards[j], cards[i] }
+func (cards ByName) Len() int           { return len(cards) }
+func (cards ByName) Less(i, j int) bool { return cards[i].Name < cards[j].Name }
+func (cards ByName) Swap(i, j int)      { cards[i], cards[j] = cards[j], cards[i] }
